@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://postgres:admin1234@localhost:5432/deployease"
+}
+
+model User {
+  id             String   @id @default(cuid())
+  name           String?
+  email          String?  @unique
+  githubId       String?  @unique
+  githubUsername String?
+  image          String?
+  createdAt      DateTime @default(now())
+
+  projects     Project[]
+  deployments  Deployment[] // 👈 Added this line (back relation)
+  ec2Instances Ec2Instance[]
+  
+}
+
+model Project {
+  id          String       @id @default(cuid())
+  name        String
+  repoUrl     String
+  branch      String       @default("main")
+  status      DeployStatus @default(PENDING)
+  user        User         @relation(fields: [userId], references: [id])
+  userId      String
+  deployments Deployment[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Deployment {
+  id String @id @default(cuid())
+
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id])
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id]) // ✅ Relation fixed
+
+  instanceId String?
+  instance   Ec2Instance? @relation(fields: [instanceId], references: [id])
+
+  repoName      String
+  repoUrl       String
+  branch        String       @default("main")
+  slug          String?
+  ec2InstanceId String?
+  ec2PublicIp   String?
+  keyPairName   String?
+  keyMaterial   String? // store private key temporarily (OPTIONAL & encrypted)
+  appType       String       @default("node")
+  appDirectory  String?
+  appPort       Int?
+  exposedUrl    String?
+  envVars       String?
+  autoDeploy    Boolean      @default(false)
+  repoSubPath   String?
+  repoPath      String?
+  entryPoint    String?
+  startedAt     DateTime     @default(now())
+  createdAt     DateTime     @default(now())
+  finishedAt    DateTime?
+  status        DeployStatus @default(PENDING)
+  logs          String?
+  updatedAt     DateTime     @updatedAt
+}
+
+enum DeployStatus {
+  PENDING
+  RUNNING
+  SUCCESS
+  FAILED
+}
+
+model Ec2Instance {
+  id                String       @id @default(cuid())
+  userId            String
+  user              User         @relation(fields: [userId], references: [id])
+  awsInstanceId     String       @unique
+  publicIp          String?
+  region            String
+  instanceType      String
+  securityGroupId   String?
+  securityGroupName String?
+  keyPairName       String
+  keyMaterial       String?
+  accessKeyId       String
+  secretAccessKey   String
+  sshUsername       String       @default("ubuntu")
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  deployments       Deployment[]
+}
