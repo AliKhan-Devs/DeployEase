@@ -1,130 +1,50 @@
-# DeployEase
-![img](./public//archetecture.png)
-DeployEase is a deployment automation tool that allows you to deploy Node.js, React, Python, and static applications to AWS EC2 with one click. It automatically configures EC2, installs dependencies, generates Nginx configurations, builds front-end apps, and provides live logs.
+### **Project Overview: DeployEase**
 
----
+**Project Name:** DeployEase
+**Author:** Ali Khan
+**Affiliation:** BSc Computer Software Engineering, UET Mardan
+**Contact:** [alikhandevs@gmail.com](mailto:alikhandevs@gmail.com)
 
-## Features
+**Description:**
+DeployEase is a web-based platform that automates deployment workflows for cloud applications on AWS. It simplifies complex DevOps tasks like provisioning EC2 instances, configuring security groups, installing runtime dependencies, managing environment variables, and configuring Nginx. The platform targets developers, students, and small teams by providing a beginner-friendly, one-click deployment dashboard while retaining transparency and control over the underlying infrastructure.
 
-* One-click deployment to AWS EC2
-* Automatic Nginx configuration
-* Automatic EC2 provisioning
-* Installs dependencies (npm install, pip install, etc.)
-* Supports Node.js, React, Python, and static apps
-* Live EC2 logs view
-* Clean route structure using utils
-* Deployment architecture diagram included (Eraser)
+**Current Features:**
 
----
+* **GitHub Authentication:** OAuth-based login for secure user access.
+* **Dashboard Management:** View and manage deployments with quick actions such as live logs, deletion, and in-browser SSH access.
+* **One-Click Deployment:** Directly deploy repositories from GitHub to EC2.
+* **Automated EC2 Provisioning:** Provision new instances or deploy to existing ones with runtime dependencies and environment setup.
+* **Dynamic Nginx Configuration:** Host multiple applications on a single instance under unique slugs/subpaths.
+* **Live SSH Terminal:** Browser-based terminal for debugging and file management.
+* **Public URL Generation:** Access applications via generated URLs without manual DNS or server configuration.
+![img](https://raw.githubusercontent.com/AliKhan-Devs/DeployEase/refs/heads/master/public/archetecture.png)
+**Planned Enhancements:**
+DeployEase is evolving to include features that make it suitable for production-like environments:
 
-## Project Structure
+* **Automated Load Balancer:** Balance HTTP(S) traffic across multiple instances via AWS ALB.
+* **Auto-Scaling & Auto-Replication:** Automatically scale instances based on resource usage.
+* **Health Checks & Monitoring:** Detect unhealthy instances and provide visual metrics on the dashboard.
+* **HTTPS/SSL Integration:** Automatic TLS certificate issuance via Let’s Encrypt.
+* **CI/CD Integration:** Deploy on commit or merge events using GitHub Actions or GitLab CI.
+* **Versioning & Rollback:** Maintain deployment versions and revert to previous stable releases.
+* **Docker Support:** Deploy containerized applications for microservices.
+* **Cost Estimation & Resource Management:** Provide real-time usage and budget estimation.
+* **Database Provisioning (Optional):** Connect to existing or managed databases (MongoDB, PostgreSQL).
 
-```
-DeployEase/
-│
-├── routes/
-│   └── deploy.js
-│
-├── utils/
-│   ├── awsUtils.js
-│   ├── nginxUtils.js
-│   ├── deployUtils.js
-│   └── logsUtils.js
-│
-├── services/
-│   └── ec2Client.js
-│
-├── README.md
-└── package.json
-```
+**New Feature Proposals (from GitHub Todo Tasks):**
 
----
+1. **Attach Volumes to Existing Instances:** Provide users the option to attach additional storage volumes to EC2 instances.
+2. **Choose Deployment Target for Static Apps:** Let users deploy static sites either on S3 (serverless) or EC2.
+3. **Deploy-On-Commit Options:** Enable automatic deployment triggered by Git repository commits.
+4. **Local File Uploads:** Allow users to upload local files and deploy applications even if no GitHub repository is linked.
 
-## Installation
+**Impact and Use Cases:**
+DeployEase significantly lowers the barrier for cloud deployment, making it accessible for learners, small teams, and freelance developers. It accelerates prototyping and MVP development, supports testing real applications in the cloud, and provides hands-on experience with AWS infrastructure without requiring deep DevOps expertise.
 
-### 1. Clone the repository
+**Technology Stack:**
 
-```bash
-git clone https://github.com/<your-username>/DeployEase.git
-cd DeployEase
-```
-
-### 2. Install dependencies
-
-```bash
-npm install
-```
-
-### 3. Create a `.env` file
-
-```
-AWS_ACCESS_KEY_ID=your_key
-AWS_SECRET_ACCESS_KEY=your_secret
-AWS_REGION=ap-south-1
-GITHUB_TOKEN=your_github_token
-```
-
----
-
-## How It Works
-
-1. User selects a GitHub repository from the dashboard.
-2. DeployEase creates an EC2 instance using AWS SDK.
-3. Security group and key pair are automatically generated.
-4. Repository is cloned into the EC2 instance.
-5. App type is detected:
-
-   * Node.js
-   * React
-   * Python
-   * Static site
-6. Dependencies are installed.
-7. React apps are built.
-8. Nginx configuration is generated.
-9. Nginx is restarted.
-10. URL of the deployed site is returned.
-
----
-
-## Running Locally
-
-Start the backend:
-
-```bash
-npm run dev
-```
-
-API runs at:
-
-```
-http://localhost:<port>
-```
-
----
-
-## Deployment Output
-
-The deployment returns:
-
-* Application URL
-* EC2 Instance ID
-* Security Group ID
-* SSH Key Name
-* Deployment logs
-* Final generated Nginx configuration
-
----
-
-## Diagram
-
-If you exported your Eraser diagram as an image, place it in the root and reference it:
-
-```
-![DeployEase Diagram](diagram.png)
-```
-
-Or share your Eraser public link.
-
----
-
-
+* **Frontend:** React/Next.js, Tailwind CSS
+* **Backend:** Node.js, Express, AWS SDK v3
+* **Database:** MongoDB/PostgreSQL
+* **Live SSH Terminal:** node-pty + WebSocket
+* **Provisioning Scripts:** Bash + systemd on EC2
