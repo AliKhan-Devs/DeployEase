@@ -1,8 +1,11 @@
 ### **Project Overview: DeployEase**
 
 **Project Name:** DeployEase
+
 **Author:** Ali Khan
+
 **Affiliation:** BSc Computer Software Engineering, UET Mardan
+
 **Contact:** [alikhandevs@gmail.com](mailto:alikhandevs@gmail.com)
 
 **Description:**
