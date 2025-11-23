@@ -1,33 +1,28 @@
+// app/layout.js
+"use client";
+
 import { Geist, Geist_Mono } from "next/font/google";
 import Provider from "@/providers/SessionProvider";
 import "./globals.css";
 import Navbar from "./components/Navbar";
+import { usePathname } from "next/navigation";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export const metadata = {
-  title: "DeployEase",
-  description: "DeployEase - Simplified Deployment to AWS EC2",
-};
+const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
+const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export default function RootLayout({ children }) {
+  const pathname = usePathname();
+  const isDashboard = pathname.startsWith("/dashboard");
+
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <Provider>
-          <Navbar />
-          {children}
-          </Provider>
+          {/* Hide navbar on dashboard */}
+          {!isDashboard && <Navbar />}
+
+          <main>{children}</main>
+        </Provider>
       </body>
     </html>
   );

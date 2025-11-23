@@ -7,7 +7,7 @@ export default function Topbar() {
   const { data: session } = useSession();
 
   return (
-    <header className="h-20 flex items-center justify-between px-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
+    <header className="h-20 flex items-center justify-between px-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm top-0 sticky z-10">
       <h1 className="text-lg font-semibold">Dashboard</h1>
       <div className="flex items-center gap-3">
         {session?.user?.image && (

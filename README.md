@@ -21,6 +21,7 @@ DeployEase is a web-based platform that automates deployment workflows for cloud
 * **Live SSH Terminal:** Browser-based terminal for debugging and file management.
 * **Automated Load Balancer:** Balance HTTP(S) traffic across multiple instances via AWS ALB.
 * **Auto-Scaling & Auto-Replication:** Automatically scale instances based on resource usage.
+* **Increase Volume of Runing Instances:** Select the instance and click to increase the volume just provide the value how much you want to increase and it will handle every thing.
 * **Public URL Generation:** Access applications via generated URLs without manual DNS or server configuration.
 ![img](https://raw.githubusercontent.com/AliKhan-Devs/DeployEase/refs/heads/master/public/archetecture.png)
 **Planned Enhancements:**

@@ -16,6 +16,39 @@ export default function AutoScalePage() {
   const [logs, setLogs] = useState([]);
   const [deployment, setDeployment] = useState(null);
 
+
+  // Get userId from session (optional if your backend uses session)
+    const [userId, setUserId] = useState(null);
+  
+    useEffect(() => {
+      async function fetchSession() {
+        const res = await fetch("/api/auth/session");
+        const data = await res.json();
+        if (data?.user?.id) setUserId(data.user.id);
+      }
+      fetchSession();
+    }, []);
+  
+    useEffect(() => {
+      if (!userId) return;
+  
+      const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:4000";
+      const socket = socketClient(SOCKET_URL);
+  
+      socket.on("connect", () => {
+        console.log("Socket connected for volume logs");
+        // Join user's room to receive logs
+        socket.emit("join-room", userId);
+      });
+  
+      socket.on("deploy-log", (msg) => {
+        setLogs((prev) => [...prev, msg]);
+      });
+  
+      return () => {
+        socket.disconnect();
+      };
+    }, [userId]);
   // Fetch deployment info for logs & IP display
   useEffect(() => {
     async function fetchDeployment() {
@@ -26,25 +59,7 @@ export default function AutoScalePage() {
     fetchDeployment();
   }, [deploymentId]);
 
-  // Socket live logs
-  useEffect(() => {
-    if (!deployment) return;
-    const socket = socketClient("http://localhost:4000");
-
-    socket.on("connect", () => {
-      console.log("Socket connected for live tail");
-      socket.emit("start-live-tail", deployment); // send deployment info for SSH
-    });
-
-    socket.on("deploy-log", (msg) => {
-      setLogs((prev) => [...prev, msg]);
-    });
-
-    return () => {
-      socket.emit("stop-live-tail", deployment.id);
-      socket.disconnect();
-    };
-  }, [deployment]);
+  
 
   const handleAutoScale = async () => {
     setSubmitting(true);

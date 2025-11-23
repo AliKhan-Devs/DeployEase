@@ -24,3 +24,28 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.btn-primary {
+  @apply w-full text-center py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition-all;
+}
+
+.btn-secondary {
+  @apply w-full text-center py-2 rounded-md bg-gray-800 text-white hover:bg-gray-900 transition-all;
+}
+
+.btn-accent {
+  @apply w-full text-center py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-all;
+}
+
+.btn-indigo {
+  @apply w-full text-center py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700 transition-all;
+}
+
+.btn-danger {
+  @apply w-full py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition-all;
+}
+
+.text-muted-foreground {
+  @apply text-gray-500 dark:text-gray-400;
+}
+

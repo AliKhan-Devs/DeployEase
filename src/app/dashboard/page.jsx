@@ -2,33 +2,52 @@
 "use client";
 import DeploymentCard from "./components/DeploymentCard";
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
 export default function DashboardPage() {
   const [deployments, setDeployments] = useState([]);
-  // Fetch all deployments from Prisma
+
   useEffect(() => {
     document.title = "Dashboard - DeployEase";
-    // fetch deployements from api/deployments
     async function fetchDeployments() {
       const res = await fetch("/api/deployments");
       const data = await res.json();
-      console.log("Fetched deployments:", data);
       setDeployments(data);
     }
     fetchDeployments();
   }, []);
 
   return (
-    <section className="p-6 space-y-6">
-      <h1 className="text-3xl font-bold">Dashboard</h1>
-      <p className="text-gray-600">Overview of all your deployments.</p>
+    <section className="space-y-6">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <h1 className="text-3xl font-bold tracking-tight">Recent Deployments</h1>
+        <p className="text-muted-foreground mt-1">
+          Overview of all your deployments.
+        </p>
+      </motion.div>
 
       {deployments.length === 0 ? (
-        <p className="text-gray-500 mt-6">No deployments yet.</p>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-gray-500 mt-6 text-center py-10 border border-dashed rounded-xl dark:border-gray-700"
+        >
+          No deployments yet. Deploy your first app 🚀
+        </motion.p>
       ) : (
-        <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-          {deployments.map((deploy) => (
-            <DeploymentCard key={deploy.id} deployment={deploy} />
+        <div className="flex flex-col gap-4 mt-6">
+          {deployments.map((deploy, index) => (
+            <motion.div
+              key={deploy.id}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+            >
+              <DeploymentCard deployment={deploy} />
+            </motion.div>
           ))}
         </div>
       )}
