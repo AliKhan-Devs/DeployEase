@@ -19,13 +19,14 @@ DeployEase is a web-based platform that automates deployment workflows for cloud
 * **Automated EC2 Provisioning:** Provision new instances or deploy to existing ones with runtime dependencies and environment setup.
 * **Dynamic Nginx Configuration:** Host multiple applications on a single instance under unique slugs/subpaths.
 * **Live SSH Terminal:** Browser-based terminal for debugging and file management.
+* **Automated Load Balancer:** Balance HTTP(S) traffic across multiple instances via AWS ALB.
+* **Auto-Scaling & Auto-Replication:** Automatically scale instances based on resource usage.
 * **Public URL Generation:** Access applications via generated URLs without manual DNS or server configuration.
 ![img](https://raw.githubusercontent.com/AliKhan-Devs/DeployEase/refs/heads/master/public/archetecture.png)
 **Planned Enhancements:**
 DeployEase is evolving to include features that make it suitable for production-like environments:
 
-* **Automated Load Balancer:** Balance HTTP(S) traffic across multiple instances via AWS ALB.
-* **Auto-Scaling & Auto-Replication:** Automatically scale instances based on resource usage.
+
 * **Health Checks & Monitoring:** Detect unhealthy instances and provide visual metrics on the dashboard.
 * **HTTPS/SSL Integration:** Automatic TLS certificate issuance via Let’s Encrypt.
 * **CI/CD Integration:** Deploy on commit or merge events using GitHub Actions or GitLab CI.
