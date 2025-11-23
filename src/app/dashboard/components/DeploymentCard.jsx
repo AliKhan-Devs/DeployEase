@@ -7,7 +7,7 @@ export default function DeploymentCard({ deployment }) {
     if (!confirmDelete) return;
 
     try {
-      await fetch(`/api/deployments/${id}`, { method: "DELETE", body: JSON.stringify({ accessKeyId: 'AKIAX4UILUEPPORQHEHA' , secretAccessKey: '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' , region: 'us-east-1' }) });
+      await fetch(`/api/deployments/${id}`, { method: "DELETE", body: JSON.stringify({ accessKeyId: process.env.AWS_ACCESS_KEY_ID , secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY , region: 'us-east-1' }) });
     } catch (err) {
       console.error(err);
     }
@@ -44,6 +44,12 @@ export default function DeploymentCard({ deployment }) {
         className="mt-4 inline-block w-full text-center bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
       >
         Connect
+      </Link>
+      <Link
+        href={`/dashboard/deployments/${deployment.id}/scall`}
+        className="mt-4 inline-block w-full text-center bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+      >
+        Auto Scale
       </Link>
 
        

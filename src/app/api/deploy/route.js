@@ -9,6 +9,7 @@ const ACTIONS = {
   DEPLOY: "deploy",
   UPDATE_ENV: "update-env",
   REDEPLOY: "redeploy",
+  CREATE_LB: "create-lb",
 };
 
 export async function POST(req) {
@@ -25,6 +26,8 @@ export async function POST(req) {
       return handleEnvUpdate({ session, body, log });
     case ACTIONS.REDEPLOY:
       return handleRedeploy({ session, body, log });
+    case ACTIONS.CREATE_LB:
+      return handleCreateLoadBalancer({ session, body, log });
     default:
       return new Response(JSON.stringify({ error: `Unsupported action: ${action}` }), { status: 400 });
   }

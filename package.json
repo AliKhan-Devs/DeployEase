@@ -8,7 +8,9 @@
     "start": "next start"
   },
   "dependencies": {
+    "@aws-sdk/client-auto-scaling": "^3.937.0",
     "@aws-sdk/client-ec2": "^3.926.0",
+    "@aws-sdk/client-elastic-load-balancing-v2": "^3.938.0",
     "@aws-sdk/client-iam": "^3.926.0",
     "@prisma/client": "^6.19.0",
     "express": "^5.1.0",
