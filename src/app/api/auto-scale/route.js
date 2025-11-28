@@ -24,19 +24,19 @@ export async function POST(req) {
   const session = await getAuthSession();
   if (!session) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
 
-  const { deploymentId, minSize, maxSize } = await req.json();
+  const { instanceId, minSize, maxSize } = await req.json();
   const log = await createLogger(session.user.id);
 
-  // Fetch deployment + instance
-  const deployment = await prisma.deployment.findUnique({
-    where: { id: deploymentId },
-    include: { instance: true },
+  // Fetch instance
+
+  const instanceData = await prisma.instance.findUnique({
+    where: { id: instanceId, userId: session.user.id },
   });
 
-  if (!deployment || !deployment.instance)
-    return new Response(JSON.stringify({ error: "Deployment or instance not found" }), { status: 404 });
-
-  const instanceData = deployment.instance;
+  if (!instanceData) {
+    await log("❌ Instance not found.");
+    return new Response(JSON.stringify({ error: "Instance not found" }), { status: 404 });
+  }
 
   const ec2 = new EC2Client({
     region: instanceData.region,
@@ -55,7 +55,7 @@ export async function POST(req) {
 
   await log("🔹 Auto-Scaling: starting workflow...");
 
-  const shortId = deployment.id.slice(0, 8);
+  const shortId = instanceData.id.slice(0, 8);
   const name = `dep-${shortId}`;
   await log(`⚙️ Using name prefix: ${name}`);
 
@@ -160,7 +160,7 @@ export async function POST(req) {
   const lbDns = lbResp.LoadBalancers[0].DNSName;
 
   await prisma.deployment.update({
-    where: { id: deployment.id },
+    where: {instanceId: instanceData.id},
     data: { exposedUrl: lbDns, autoDeploy: true },
   });
 

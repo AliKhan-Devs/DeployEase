@@ -1,8 +1,10 @@
 // app/dashboard/layout.js
-import Sidebar from "./components/Sidebar";
+
 // import DashboardNavbar from "./components/DashboardNavbar"; // optional
+import Sidebar from "@/components/dashboard/sidebar";
 import "../globals.css";
-import Topbar from "./components/Topbar";
+import Topbar from "@/components/dashboard/topbar";
+
 
 export const metadata = {
   title: "Dashboard - DeployEase",

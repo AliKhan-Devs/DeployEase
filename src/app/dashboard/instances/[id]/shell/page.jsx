@@ -32,7 +32,7 @@ export default function LiveShellPage() {
     // Join room and start SSH
     socket.on("connect", () => {
       socket.emit("join-room", session.user.id);
-      socket.emit("start-ssh", { deployment: { id } });
+      socket.emit("start-ssh", { instance: { id } });
     });
 
     // Write SSH output to terminal

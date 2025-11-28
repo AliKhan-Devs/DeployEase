@@ -9,24 +9,20 @@ export default function setupLiveShell(io) {
     let sshSession = null;
     let sshStream = null;
 
-    socket.on("start-ssh", async ({ deployment }) => {
+    socket.on("start-ssh", async ({ instance }) => {
       sshSession = new NodeSSH();
 
       try {
-        // fetch deployment from DB
-        const dep = await prisma.deployment.findUnique({
-          where: { id: deployment.id },
-          include: { instance: true } // include EC2 instance info
+        // fetch instance from DB
+        const instance = await prisma.ec2Instance.findUnique({
+          where: { id: instance.id },
         });
 
-        if (!dep) throw new Error("Deployment not found");
-        if (!dep.instance?.publicIp) throw new Error("Deployment has no public IP");
-
-        const privateKey = decryptSecret(dep.instance.keyMaterial);
+        const privateKey = decryptSecret(instance.keyMaterial);
 
         await sshSession.connect({
-          host: dep.instance.publicIp,
-          username: dep.instance.sshUsername || "ubuntu",
+          host: instance.publicIp,
+          username: instance.sshUsername || "ubuntu",
           privateKey,
         });
 
