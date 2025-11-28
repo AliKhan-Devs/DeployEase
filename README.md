@@ -1,5 +1,5 @@
 ### **Project Overview: DeployEase**
-
+![img](./public/deployease-herosection.JPG)
 **Project Name:** DeployEase
 
 **Author:** Ali Khan
