@@ -1,6 +1,6 @@
 
 import { NodeSSH } from "node-ssh";
-import { createLogger } from "./createLogger";
+
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();

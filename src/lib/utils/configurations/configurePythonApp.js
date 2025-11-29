@@ -1,4 +1,4 @@
-import { escapeDoubleQuotes } from "../helpers";
+import { escapeDoubleQuotes } from "../helpers.js";
 
 export async function configurePythonApp({ ssh, repoDir, appDir, mainfile, slug, port, log }) {
     await log("📦 Installing Python requirements...");

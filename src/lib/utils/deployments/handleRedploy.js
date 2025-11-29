@@ -1,7 +1,7 @@
 
-import { createLogger } from "../createLogger";
-import { performDeployment } from "./performDeployment";
-import { defaultEntryPoint } from "../helpers";
+
+import { performDeployment } from "./performDeployment.js";
+import { defaultEntryPoint } from "../helpers.js";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();

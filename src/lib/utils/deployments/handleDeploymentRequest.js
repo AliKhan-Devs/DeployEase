@@ -1,8 +1,8 @@
 
-import { createLogger } from "../createLogger";
+
 import { EC2Client } from "@aws-sdk/client-ec2";
-import { createEc2Instance } from "./EC2_Instance";
-import { performDeployment } from "./performDeployment";
+import { createEc2Instance } from "./EC2_Instance.js";
+import { performDeployment } from "./performDeployment.js";
 import { PrismaClient } from "@prisma/client";
 
 
@@ -27,7 +27,7 @@ export async function handleDeploymentRequest({ session, body,log }) {
       autoDeploy = false,
       targetInstanceId = null,
     } = body;
-    const userId = session.user.id;
+    const userId = session.id;
   
     if (!repoName || !repoUrl) {
       return new Response(JSON.stringify({ error: "Repository name and URL are required." }), { status: 400 });
@@ -39,7 +39,7 @@ export async function handleDeploymentRequest({ session, body,log }) {
   
     
     await log("🚀 Starting deployment workflow...");
-  
+    console.log("started deployment hhh")
     let instanceRecord = null;
     let privateKey = null;
     let ec2Client = null;
@@ -158,3 +158,4 @@ export async function handleDeploymentRequest({ session, body,log }) {
     }
   }
   
+

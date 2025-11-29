@@ -1,4 +1,4 @@
-import { escapeDoubleQuotes } from "../helpers";
+import { escapeDoubleQuotes } from "../helpers.js";
 
 const NODE_APP_EXTENSIONS = [".js", ".mjs", ".cjs", ".ts", ".mts", ".cts"];
 

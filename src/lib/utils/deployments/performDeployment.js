@@ -1,10 +1,10 @@
 import { NodeSSH } from "node-ssh";
-import { decryptSecret } from "../encryptDecrypt";
-import { buildAppPaths, defaultEntryPoint, installStack, slugifyName, syncRepository, writeEnvFile } from "../helpers";
-import { ensureNginxBase, writeNginxLocation } from "../nginxSetup";
-import { configureNodeApp } from "../configurations/configureNodeApp";
-import { configureReactApp } from "../configurations/configureReactApp";
-import { configurePythonApp } from "../configurations/configurePythonApp";
+import { decryptSecret } from "../encryptDecrypt.js";
+import { buildAppPaths, defaultEntryPoint, installStack, slugifyName, syncRepository, writeEnvFile } from "../helpers.js";
+import { ensureNginxBase, writeNginxLocation } from "../nginxSetup.js";
+import { configureNodeApp } from "../configurations/configureNodeApp.js";
+import { configureReactApp } from "../configurations/configureReactApp.js";
+import { configurePythonApp } from "../configurations/configurePythonApp.js";
 
 
 

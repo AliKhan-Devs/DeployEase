@@ -1,7 +1,7 @@
 // --------------------------
 // Deploy React App
 
-import { writeNginxLocation } from "../nginxSetup";
+import { writeNginxLocation } from "../nginxSetup.js";
 
 // --------------------------
 export async function configureReactApp({ ssh, repoDir, slug, log }) {

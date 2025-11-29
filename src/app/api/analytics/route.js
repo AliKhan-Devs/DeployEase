@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { getAuthSession } from "@/lib/authSession";
 import { PrismaClient } from "@prisma/client";
+import { getRedisClient } from "@/lib/redis/client";
+
+const redis = getRedisClient();
 const prisma = new PrismaClient();
 
 export async function GET() {
@@ -16,6 +19,13 @@ export async function GET() {
 
     const userId = session.user.id;
 
+ 
+    // Check if cached data exists in Redis
+    const cachedData = await redis.get(`analytics:${userId}`);
+    if (cachedData) {
+      console.log("Using cached analytics data");
+      return NextResponse.json(JSON.parse(cachedData));
+    }
     // --------------------
     // DEPLOYMENTS ANALYTICS
     // --------------------
@@ -59,6 +69,23 @@ export async function GET() {
         publicIp: { not: null } 
       },
     });
+
+       // Lets store user analytics in cache for faster access next time (TTL: 1 hour)
+    await redis.set(`analytics:${userId}`, JSON.stringify({success: true,
+      analytics: {
+        deployments: {
+          total: totalDeployments,
+          success: successfulDeployments,
+          failed: failedDeployments,
+          running: runningDeployments,
+          lastDeployment,
+          recentDeployments,
+        },
+        ec2: {
+          total: totalEC2Instances,
+          active: activeEC2Instances,
+        },
+      }}), "EX", 3600);
 
     return NextResponse.json({
       success: true,

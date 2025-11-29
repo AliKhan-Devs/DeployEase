@@ -6,7 +6,7 @@ import { defaultEntryPoint, handleEnvUpdate } from "@/lib/utils/helpers";
 
 // Redis imports
 import { getSession, setSession } from "@/lib/redis/sessionCache";
-import { deploymentQueue } from "@/lib/redis/queue";
+import { deploymentQueue } from "@/lib/redis/queues";
 
 const ACTIONS = {
   DEPLOY: "deploy",
@@ -47,7 +47,13 @@ export async function POST(req) {
      
       // Instead of running deployment synchronously (blocking API),
       // we push it to BullMQ queue stored in Redis
-      const job = await deploymentQueue.add("deployApp", { session, body, log });
+      const job = await deploymentQueue.add("deployApp", {
+  userId: session.user.id,
+  projectId: body.projectId,
+  action: body.action,
+  payload: body,
+});
+
 
       // Return immediately with job ID so frontend can track status
       return new Response(

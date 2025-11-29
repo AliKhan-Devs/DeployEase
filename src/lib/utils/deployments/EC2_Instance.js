@@ -138,9 +138,9 @@ import {
   GetInstanceProfileCommand,
 } from "@aws-sdk/client-iam";
 
-import { encryptSecret } from "../encryptDecrypt";
+import { encryptSecret } from "../encryptDecrypt.js";
 import { PrismaClient } from "@prisma/client";
-import { buildIpPermissions } from "../helpers";
+import { buildIpPermissions } from "../helpers.js";
 
 const prisma = new PrismaClient();
 const DEFAULT_AMI = process.env.DEPLOYEASE_UBUNTU_AMI || "ami-0ecb62995f68bb549";
