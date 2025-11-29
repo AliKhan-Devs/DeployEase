@@ -5,6 +5,8 @@ import { createEc2Instance } from "./EC2_Instance.js";
 import { performDeployment } from "./performDeployment.js";
 import { PrismaClient } from "@prisma/client";
 
+import { getRedisClient } from "@/lib/redis/client.js";
+const redis = getRedisClient();
 
 const prisma = new PrismaClient();
 
@@ -128,6 +130,13 @@ export async function handleDeploymentRequest({ session, body,log }) {
       });
   
       await log("✅ Deployment saved successfully");
+      
+      // Remove all cached information because now we have a new deployment for this instance state so we need to remove instances and deployments as well as analytics removal 
+
+      await redis.del(`analytics:${userId}`);
+      await redis.del(`instances:${userId}`);
+      await redis.del(`deployments:${userId}`);
+
       const responsePayload = {
         success: true,
         message: "Deployment completed successfully.",
