@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import { PrismaClient } from "@prisma/client";
-import { performDeployment, createLogger, defaultEntryPoint } from "@/app/api/deploy/route";
+import { performDeployment, createLogger } from "@/app/api/deploy/route";
+import { defaultEntryPoint } from "@/lib/utils/helpers";
 
 const prisma = new PrismaClient();
 

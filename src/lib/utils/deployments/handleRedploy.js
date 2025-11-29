@@ -1,10 +1,11 @@
 
 import { createLogger } from "../createLogger";
 import { performDeployment } from "./performDeployment";
-
+import { defaultEntryPoint } from "../helpers";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
+
 
 export async function handleRedeploy({ session, body, log }) {
   const userId = session.user.id;

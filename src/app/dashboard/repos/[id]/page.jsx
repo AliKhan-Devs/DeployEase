@@ -126,49 +126,90 @@ export default function RepoDeployPage() {
     }));
   };
 
+  // const handleDeploy = async () => {
+  //   setLoading(true);
+  //   setError(null);
+  //   setLogs([]);
+  //   try {
+  //     const body = { ...form, repoName, repoUrl, branch: "main", action: "deploy" };
+  //     if (selectedInstance) {
+  //       body.region = selectedInstance.region;
+  //       body.instanceType = selectedInstance.instanceType;
+  //     }
+  //     const res = await fetch("/api/deploy", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify(body),
+  //     });
+  //     if (!res.ok) throw new Error("Deployment failed");
+  //     const data = await res.json();
+  //     if (data.error) throw new Error(data.error);
+
+  //     if (data.privateKey && data.keyPairName) {
+  //       const blob = new Blob([data.privateKey], { type: "application/x-pem-file" });
+  //       const a = document.createElement("a");
+  //       a.href = URL.createObjectURL(blob);
+  //       a.download = `${data.keyPairName}.pem`;
+  //       document.body.appendChild(a);
+  //       a.click();
+  //       a.remove();
+  //       URL.revokeObjectURL(a.href);
+  //     }
+
+  //     setDeployment(data);
+  //     setLogs((prev) => [
+  //       ...prev,
+  //       `✅ Deployment complete! Visit ${data.deployment?.exposedUrl || `http://${data.publicIp}`}`,
+  //     ]);
+  //     setRefreshFlag((prev) => prev + 1);
+  //   } catch (err) {
+  //     setError(err.message);
+  //     setLogs((prev) => [...prev, `❌ Error: ${err.message}`]);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+
+
   const handleDeploy = async () => {
-    setLoading(true);
-    setError(null);
-    setLogs([]);
-    try {
-      const body = { ...form, repoName, repoUrl, branch: "main", action: "deploy" };
-      if (selectedInstance) {
-        body.region = selectedInstance.region;
-        body.instanceType = selectedInstance.instanceType;
-      }
-      const res = await fetch("/api/deploy", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      if (!res.ok) throw new Error("Deployment failed");
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
+  setLoading(true);
+  setError(null);
+  setLogs([]);
 
-      if (data.privateKey && data.keyPairName) {
-        const blob = new Blob([data.privateKey], { type: "application/x-pem-file" });
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = `${data.keyPairName}.pem`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(a.href);
-      }
-
-      setDeployment(data);
-      setLogs((prev) => [
-        ...prev,
-        `✅ Deployment complete! Visit ${data.deployment?.exposedUrl || `http://${data.publicIp}`}`,
-      ]);
-      setRefreshFlag((prev) => prev + 1);
-    } catch (err) {
-      setError(err.message);
-      setLogs((prev) => [...prev, `❌ Error: ${err.message}`]);
-    } finally {
-      setLoading(false);
+  try {
+    const body = { ...form, repoName, repoUrl, branch: "main", action: "deploy" };
+    if (selectedInstance) {
+      body.region = selectedInstance.region;
+      body.instanceType = selectedInstance.instanceType;
     }
-  };
+
+    const res = await fetch("/api/deploy", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+    if (!res.ok) throw new Error("Deployment failed");
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    // 🎯 Immediate toast notification
+    toast.success(`🚀 Deployment queued! Job ID: ${data.deploymentId}`, {
+      icon: '🟢',
+    });
+
+    setDeployment(data);
+    setRefreshFlag((prev) => prev + 1);
+
+  } catch (err) {
+    setError(err.message);
+    toast.error(`❌ Deployment failed: ${err.message}`, { icon: '⚠️' });
+    setLogs((prev) => [...prev, `❌ Error: ${err.message}`]);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleUpdateEnv = async (deploymentId) => {
     const newEnv = prompt("Enter new environment variables (overwrites existing):", "");
