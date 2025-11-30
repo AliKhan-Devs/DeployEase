@@ -12,6 +12,7 @@ import {
 } from "@aws-sdk/client-ssm";
 import { getAuthSession } from "@/lib/authSession";
 import { createLogger } from "@/lib/utils/createLogger";
+import { decryptSecret } from "@/lib/utils/encryptDecrypt";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -24,31 +25,39 @@ export async function POST(req) {
 
     const { instanceId, additionalGB } = await req.json();
 
-    if (!deploymentId || !additionalGB) return new Response(JSON.stringify({ error: "deploymentId and additionalGB required" }), { status: 400 });
+    if (!instanceId || !additionalGB) return new Response(JSON.stringify({ error: "instanceId and additionalGB required" }), { status: 400 });
     if (isNaN(additionalGB) || additionalGB < 1) return new Response(JSON.stringify({ error: "additionalGB must be a positive number" }), { status: 400 });
 
     const log = await createLogger(session.user.id);
-    await log(`🔹 Increase Volume Workflow started for Deployment: ${deploymentId}`);
+    await log(`🔹 Increase Volume Workflow started for Instance: ${instanceId}`);
 
-    // Fetch instance
-    const instance = await prisma.ec2Instance.findUnique({
-      where: { id: instanceId },
+    // Fetch instance and verify ownership
+    const instance = await prisma.ec2Instance.findFirst({
+      where: { 
+        id: instanceId,
+        userId: session.user.id,
+      },
     });
     
     if (!instance) {
-      await log("❌ Instance not found.");
-      return new Response(JSON.stringify({ error: "Instance not found" }), { status: 404 });
+      await log("❌ Instance not found or access denied.");
+      return new Response(JSON.stringify({ error: "Instance not found or access denied" }), { status: 404 });
     }
     
+    // Decrypt credentials
+    const credentials = {
+      accessKeyId: decryptSecret(instance.accessKeyId),
+      secretAccessKey: decryptSecret(instance.secretAccessKey),
+    };
 
     // AWS clients
     const ec2 = new EC2Client({
       region: instance.region,
-      credentials: { accessKeyId: instance.accessKeyId, secretAccessKey: instance.secretAccessKey },
+      credentials,
     });
     const ssm = new SSMClient({
       region: instance.region,
-      credentials: { accessKeyId: instance.accessKeyId, secretAccessKey: instance.secretAccessKey },
+      credentials,
     });
 
     await log(`📌 Describing instance: ${instance.awsInstanceId}`);

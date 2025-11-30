@@ -4,40 +4,56 @@ import { EC2Client } from "@aws-sdk/client-ec2";
 import { createEc2Instance } from "./EC2_Instance.js";
 import { performDeployment } from "./performDeployment.js";
 import { PrismaClient } from "@prisma/client";
+import { decryptSecret } from "../encryptDecrypt.js";
 
-import { getRedisClient } from "@/lib/redis/client.js";
+import { getRedisClient } from "../../redis/client.js";
 const redis = getRedisClient();
 
 const prisma = new PrismaClient();
 
 
 
-export async function handleDeploymentRequest({ session, body,log }) {
-    const {
-      accessKeyId,
-      secretAccessKey,
-      region,
-      instanceType,
-      repoName,
-      repoUrl,
-      branch = "main",
-      port = "3000",
-      mainfile = "index.js",
-      env = "",
-      appType = "node",
-      repoSubPath = "",
-      autoDeploy = false,
-      targetInstanceId = null,
-    } = body;
-    const userId = session.id;
+export async function handleDeploymentRequest({ session, body, log }) {
+  console.log("entered handleDeploymentRequest");
   
-    if (!repoName || !repoUrl) {
-      return new Response(JSON.stringify({ error: "Repository name and URL are required." }), { status: 400 });
-    }
+  // Handle both session object (from API) and user object (from worker)
+  const userId = session?.user?.id || session?.id;
   
-    if (!region && !targetInstanceId) {
-      return new Response(JSON.stringify({ error: "AWS region is required for new instances." }), { status: 400 });
-    }
+  if (!userId) {
+    throw new Error("User ID is required. Session object is invalid.");
+  }
+
+  const {
+    accessKeyId,
+    secretAccessKey,
+    region,
+    instanceType,
+    repoUrl,
+    branch = "main",
+    port = "3000",
+    mainfile = "index.js",
+    env = "",
+    appType = "node",
+    repoSubPath = "",
+    autoDeploy = false,
+    targetInstanceId = null,
+  } = body;
+
+  // Generate repoName from repoUrl if not provided
+  let repoName = body.repoName;
+  if (!repoName && repoUrl) {
+    // Extract repo name from URL (e.g., https://github.com/user/repo -> repo)
+    const urlParts = repoUrl.split("/");
+    repoName = urlParts[urlParts.length - 1]?.replace(".git", "") || `No_name_${Date.now()}`;
+  }
+
+  if (!repoUrl) {
+    throw new Error("Repository URL is required.");
+  }
+  
+  if (!region && !targetInstanceId) {
+    throw new Error("AWS region is required for new instances.");
+  }
   
     
     await log("🚀 Starting deployment workflow...");
@@ -52,7 +68,7 @@ export async function handleDeploymentRequest({ session, body,log }) {
         where: { id: targetInstanceId, userId },
       });
       if (!instanceRecord) {
-        return new Response(JSON.stringify({ error: "Instance not found or access denied." }), { status: 404 });
+        throw new Error("Instance not found or access denied.");
       }
       credentials = {
         accessKeyId: decryptSecret(instanceRecord.accessKeyId),
@@ -65,9 +81,7 @@ export async function handleDeploymentRequest({ session, body,log }) {
       await log(`♻️ Reusing existing EC2 instance (${instanceRecord.awsInstanceId})`);
     } else {
       if (!accessKeyId || !secretAccessKey || !region) {
-        return new Response(JSON.stringify({ error: "AWS credentials and region are required to provision a new instance." }), {
-          status: 400,
-        });
+        throw new Error("AWS credentials and region are required to provision a new instance.");
       }
       ec2Client = new EC2Client({
         region,
@@ -147,23 +161,30 @@ export async function handleDeploymentRequest({ session, body,log }) {
         deployment,
       };
   
-      return new Response(JSON.stringify(responsePayload), {
-        headers: { "Content-Type": "application/json" },
-      });
+      // Return payload (not Response object) since this can be called from worker
+      return responsePayload;
     } catch (err) {
       await log(`❌ Deployment error: ${err.message || err}`);
-      await prisma.deployment.create({
-        data: {
-          user: { connect: { id: userId } },
-          instance: instanceRecord ? { connect: { id: instanceRecord.id } } : undefined,
-          repoName,
-          repoUrl,
-          branch,
-          status: "FAILED",
-          logs: String(err.stack || err.message || err),
-        },
-      }).catch(() => { });
-      return new Response(JSON.stringify({ error: err.message || String(err) }), { status: 500 });
+      
+      // Create failed deployment record
+      try {
+        await prisma.deployment.create({
+          data: {
+            user: { connect: { id: userId } },
+            instance: instanceRecord ? { connect: { id: instanceRecord.id } } : undefined,
+            repoName: repoName || "Unknown",
+            repoUrl,
+            branch,
+            status: "FAILED",
+            logs: String(err.stack || err.message || err),
+          },
+        });
+      } catch (dbErr) {
+        console.error("Failed to create failed deployment record:", dbErr);
+      }
+      
+      // Throw error so worker can handle it
+      throw err;
     }
   }
   

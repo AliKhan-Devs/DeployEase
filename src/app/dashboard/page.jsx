@@ -14,6 +14,8 @@ import Loading from "../loading";
 import { FiServer, FiBarChart2, FiCpu, FiCheckCircle, FiXCircle, FiClock } from "react-icons/fi";
 import { SiNodedotjs, SiPython, SiReact } from "react-icons/si";
 import { FiGlobe } from "react-icons/fi";
+import Link from "next/link";
+
 
 // Map app type → icon
 const getAppIcon = (type) => {
@@ -132,6 +134,33 @@ export default function DashboardPage() {
         />
       </div>
 
+      {/* AI Assistant Quick Access */}
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+        <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-800 mb-6">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-900">
+                  {/* <FiBot size={32} className="text-blue-600 dark:text-blue-400" /> */}
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold mb-1">Need Help? Ask Our AI Assistant!</h3>
+                  <p className="text-muted-foreground">
+                    Don't understand something? Our AI assistant can help you deploy, manage, and scale your applications through simple conversation.
+                  </p>
+                </div>
+              </div>
+              <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700">
+                <Link href="/dashboard/mcp">
+                  {/* <FiBot className="mr-2" /> */}
+                  Open AI Assistant
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
       {/* Recent Deployments */}
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
         <h2 className="text-2xl font-bold mt-8 mb-4">Recent Deployments</h2>
@@ -176,6 +205,8 @@ export default function DashboardPage() {
           </div>
         )}
       </motion.div>
+
+
     </section>
   );
 }

@@ -23,6 +23,7 @@ DeployEase is a web-based platform that automates deployment workflows for cloud
 * **Auto-Scaling & Auto-Replication:** Automatically scale instances based on resource usage.
 * **Increase Volume of Runing Instances:** Select the instance and click to increase the volume just provide the value how much you want to increase and it will handle every thing.
 * **Public URL Generation:** Access applications via generated URLs without manual DNS or server configuration.
+* **MCP Server for AI Agents:** Model Context Protocol server that enables AI agents to deploy repositories, scale applications, and manage infrastructure through natural language commands.
 ![img](https://raw.githubusercontent.com/AliKhan-Devs/DeployEase/refs/heads/master/public/archetecture.png)
 **Planned Enhancements:**
 DeployEase is evolving to include features that make it suitable for production-like environments:
@@ -53,3 +54,16 @@ DeployEase significantly lowers the barrier for cloud deployment, making it acce
 * **Database:** MongoDB/PostgreSQL
 * **Live SSH Terminal:** node-pty + WebSocket
 * **Provisioning Scripts:** Bash + systemd on EC2
+* **MCP Server:** Model Context Protocol SDK for AI agent integration
+
+**MCP Server:**
+
+DeployEase includes an MCP (Model Context Protocol) server that allows AI agents to interact with the platform. The MCP server is located in the `mcp-server/` directory and provides tools for:
+
+* Deploying GitHub repositories to AWS EC2
+* Scaling applications with auto-scaling groups
+* Increasing instance storage volumes
+* Listing deployments and instances
+* Checking deployment status
+
+See `mcp-server/README.md` for setup and usage instructions.

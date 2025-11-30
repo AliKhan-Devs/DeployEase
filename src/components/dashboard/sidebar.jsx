@@ -2,7 +2,7 @@
 "use client";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, Folder, ServerCogIcon, Settings, Server } from "lucide-react";
+import { LayoutDashboard, Folder, ServerCogIcon, Settings, Server, Bot } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar"; // Shadecn UI
 import { ScrollArea } from "@/components/ui/scroll-area"; // Shadecn UI
 import { MdTerminal } from "react-icons/md";
@@ -13,6 +13,7 @@ const links = [
   {name:"Instances",href: "/dashboard/instances",icon:Server},
   { name: "Deployments", href: "/dashboard/deployments", icon: ServerCogIcon },
   { name: "Your Repos", href: "/dashboard/repos", icon: Folder },
+  { name: "AI Integration", href: "/dashboard/mcp", icon: Bot },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
