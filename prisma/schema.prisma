@@ -14,12 +14,13 @@ model User {
   githubId       String?  @unique
   githubUsername String?
   image          String?
+  awsAccessKeyId     String?
+  awsSecretAccessKey String?
   createdAt      DateTime @default(now())
 
   projects     Project[]
-  deployments  Deployment[] // 👈 Added this line (back relation)
+  deployments  Deployment[] 
   ec2Instances Ec2Instance[]
-  
 }
 
 model Project {

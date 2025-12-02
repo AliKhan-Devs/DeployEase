@@ -92,6 +92,12 @@ DEPLOYEASE_SESSION_TOKEN=${sessionToken}`;
 
   return (
     <section className="p-6 space-y-6 max-w-5xl mx-auto">
+
+      {/* AI Agent Chat - Main Interface */}
+          <AIAgentChat />
+        
+
+
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
         <div className="flex items-center gap-3 mb-2">
@@ -355,21 +361,7 @@ npm install`}
         </CardContent>
       </Card>
 
-      {/* AI Agent Chat - Main Interface */}
-      <Card className="h-[700px]">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <SiOpenai size={20} />
-            AI Assistant Chat
-          </CardTitle>
-          <CardDescription>
-            Talk to our AI assistant - it understands DeployEase and can help you deploy, manage, and scale your applications through natural conversation!
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="h-[calc(100%-100px)] p-0">
-          <AIAgentChat />
-        </CardContent>
-      </Card>
+      
 
       {/* AI Agent Terminal - Advanced Users */}
       {/* <Card className="h-[600px]">

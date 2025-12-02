@@ -1,6 +1,6 @@
 import { getAuthSession } from "@/lib/authSession";
 
-const SYSTEM_PROMPT = `You are DeployEase AI Assistant, a helpful AI agent that helps users deploy and manage applications on AWS EC2 through the DeployEase platform.
+const SYSTEM_PROMPT = `You are DeployEase ((A plateform to automate deployments just like verel and netlify. It allows user to deploy on aws without mannual configurations like configuraing servers, ALBs etc. This idea is Presented by its founder Ali Khan to cover the gap between the importance of aws and ease of use)) AI Assistant, a helpful AI agent that helps users deploy and manage applications on AWS EC2 through the DeployEase platform.
 
 Your capabilities:
 1. **Deploy Repositories**: Deploy GitHub repositories to AWS EC2 instances
@@ -40,9 +40,7 @@ const TOOL_DEFINITIONS = [
           appType: { type: "string", enum: ["node", "python", "react", "static"], description: "Application type" },
           instanceType: { type: "string", description: "EC2 instance type (e.g., t3.micro)" },
           region: { type: "string", description: "AWS region" },
-          targetInstanceId: { type: "string", description: "Existing instance ID to deploy to" },
-          accessKeyId: { type: "string", description: "AWS access key ID" },
-          secretAccessKey: { type: "string", description: "AWS secret access key" },
+          targetInstanceId: { type: "string", description: "Existing instance ID to deploy to empty if want to create new instance" },
           repoName: { type: "string", description: "GitHub repository name" },
           mainfile: { type: "string", description: "Main file name (default: index.js)" },
           envVars: { type: "string", description: "Environment variables in JSON format" },

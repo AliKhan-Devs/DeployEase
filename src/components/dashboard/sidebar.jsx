@@ -13,7 +13,7 @@ const links = [
   {name:"Instances",href: "/dashboard/instances",icon:Server},
   { name: "Deployments", href: "/dashboard/deployments", icon: ServerCogIcon },
   { name: "Your Repos", href: "/dashboard/repos", icon: Folder },
-  { name: "AI Integration", href: "/dashboard/mcp", icon: Bot },
+  { name: "DeployGPT", href: "/dashboard/agent", icon: Bot },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 

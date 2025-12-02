@@ -5,7 +5,7 @@ import { ensureNginxBase, writeNginxLocation } from "../nginxSetup.js";
 import { configureNodeApp } from "../configurations/configureNodeApp.js";
 import { configureReactApp } from "../configurations/configureReactApp.js";
 import { configurePythonApp } from "../configurations/configurePythonApp.js";
-
+import { configureStaticApp } from "../configurations/configureStaticApp.js";
 
 
 async function waitForSSH(ssh, host, username, privateKey, log) {

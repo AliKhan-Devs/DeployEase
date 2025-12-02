@@ -23,9 +23,30 @@ export async function handleDeploymentRequest({ session, body, log }) {
     throw new Error("User ID is required. Session object is invalid.");
   }
 
+  // get user from cache or database
+  let user = null;
+  const cacheKey = `user-details:${userId}`;
+  const cachedUser = await redis.get(cacheKey);
+
+  if (cachedUser) {
+    user = JSON.parse(cachedUser);
+  } else {
+    user = await prisma.user.findUnique({ where: { id: userId } });
+    if (user) {
+      await redis.set(cacheKey, JSON.stringify(user));
+    }
+  }
+  if (!user) {
+    throw new Error("User not found.");
+  }
+
+
+  const accessKeyId = user.awsAccessKeyId;
+  const secretAccessKey = user.awsSecretAccessKey;
+
+  console.log(accessKeyId,secretAccessKey);
+  
   const {
-    accessKeyId,
-    secretAccessKey,
     region,
     instanceType,
     repoUrl,
@@ -62,6 +83,7 @@ export async function handleDeploymentRequest({ session, body, log }) {
     let privateKey = null;
     let ec2Client = null;
     let credentials = { accessKeyId, secretAccessKey };
+
   
     if (targetInstanceId) {
       instanceRecord = await prisma.ec2Instance.findFirst({

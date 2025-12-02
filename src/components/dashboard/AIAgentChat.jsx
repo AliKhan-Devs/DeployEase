@@ -15,7 +15,7 @@ import {
 import toast from "react-hot-toast";
 import { FaRobot } from "react-icons/fa";
 
-const SYSTEM_PROMPT = `You are DeployEase AI Assistant, a helpful AI agent that helps users deploy and manage applications on AWS EC2 through the DeployEase platform.
+const SYSTEM_PROMPT = `You are DeployEase (A plateform to automate deployments just like verel and netlify. It allows user to deploy on aws without mannual configurations like configuraing servers, ALBs etc. This idea is Presented by its founder Ali Khan to cover the gap between the importance of aws and ease of use) AI Assistant, a helpful AI agent that helps users deploy and manage applications on AWS EC2 through the DeployEase platform.
 
 Your capabilities:
 1. **Deploy Repositories**: Deploy GitHub repositories to AWS EC2 instances
@@ -219,7 +219,7 @@ export default function AIAgentChat() {
   };
 
   return (
-    <Card className="h-full flex flex-col">
+    <Card className="h-screen flex flex-col">
       <CardHeader className="pb-3 border-b">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
