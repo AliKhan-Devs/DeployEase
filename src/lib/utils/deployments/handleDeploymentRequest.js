@@ -5,6 +5,10 @@ import { createEc2Instance } from "./EC2_Instance.js";
 import { performDeployment } from "./performDeployment.js";
 import { PrismaClient } from "@prisma/client";
 import { decryptSecret } from "../encryptDecrypt.js";
+import { detectServices, normalizeServiceConfig } from "../services/serviceDetection.js";
+import { deployService } from "../services/serviceDeployment.js";
+import { configureApiGatewayForServices } from "../services/apiGatewayIntegration.js";
+import { ApiGatewayV2Client } from "@aws-sdk/client-apigatewayv2";
 
 import { getRedisClient } from "../../redis/client.js";
 const redis = getRedisClient();
@@ -58,6 +62,10 @@ export async function handleDeploymentRequest({ session, body, log }) {
     repoSubPath = "",
     autoDeploy = false,
     targetInstanceId = null,
+    // Multi-service deployment flags
+    multiService = false, // Enable multi-service mode
+    services = null, // Optional: pre-defined services array
+    enableApiGateway = false, // Enable API Gateway integration
   } = body;
 
   // Generate repoName from repoUrl if not provided
@@ -123,6 +131,110 @@ export async function handleDeploymentRequest({ session, body, log }) {
     }
   
     try {
+      const finalRegion = instanceRecord.region;
+      const finalCredentials = credentials;
+
+      // Multi-service deployment path
+      if (multiService || services) {
+        await log("🔀 Multi-service deployment mode enabled");
+        
+        let serviceConfigs = services;
+        if (!serviceConfigs) {
+          // Auto-detect services from repository
+          serviceConfigs = await detectServices(repoUrl, branch, log);
+        }
+
+        // Normalize all service configs
+        serviceConfigs = serviceConfigs.map(config => normalizeServiceConfig(config));
+        
+        await log(`📦 Deploying ${serviceConfigs.length} service(s)...`);
+
+        const deployedServices = [];
+        const serviceRecords = [];
+
+        // Deploy each service
+        for (const serviceConfig of serviceConfigs) {
+          try {
+            const serviceRecord = await deployService({
+              serviceConfig,
+              instanceRecord,
+              repoUrl,
+              branch,
+              repoName,
+              userId,
+              credentials: finalCredentials,
+              region: finalRegion,
+              log,
+            });
+            deployedServices.push(serviceRecord);
+            serviceRecords.push(serviceRecord);
+          } catch (serviceError) {
+            await log(`⚠️ Failed to deploy service ${serviceConfig.name}: ${serviceError.message}`);
+            // Continue with other services
+          }
+        }
+
+        // Configure API Gateway if enabled
+        let apiGatewayRoutes = [];
+        if (enableApiGateway && deployedServices.length > 0) {
+          try {
+            await log("📡 Configuring API Gateway...");
+            const apiGatewayClient = new ApiGatewayV2Client({
+              region: finalRegion,
+              credentials: finalCredentials,
+            });
+
+            apiGatewayRoutes = await configureApiGatewayForServices({
+              apiGatewayClient,
+              services: serviceRecords,
+              region: finalRegion,
+              credentials: finalCredentials,
+              log,
+            });
+
+            // Update services with API Gateway endpoints
+            for (const route of apiGatewayRoutes) {
+              await prisma.service.update({
+                where: { id: route.serviceId },
+                data: {
+                  apiGatewayRouteKey: route.routeKey,
+                  apiGatewayEndpoint: route.endpoint,
+                },
+              });
+            }
+
+            await log(`✅ API Gateway configured with ${apiGatewayRoutes.length} route(s)`);
+          } catch (apiGatewayError) {
+            await log(`⚠️ API Gateway configuration failed: ${apiGatewayError.message}`);
+            // Continue - API Gateway is optional
+          }
+        }
+
+        // Clear cache
+        await redis.del(`analytics:${userId}`);
+        await redis.del(`instances:${userId}`);
+        await redis.del(`deployments:${userId}`);
+
+        return {
+          success: true,
+          message: `Multi-service deployment completed. ${deployedServices.length} service(s) deployed.`,
+          instanceId: instanceRecord.awsInstanceId,
+          publicIp: instanceRecord.publicIp,
+          keyPairName: instanceRecord.keyPairName,
+          privateKey: privateKey || undefined,
+          services: deployedServices.map(s => ({
+            id: s.id,
+            name: s.name,
+            displayName: s.displayName,
+            exposedUrl: s.exposedUrl,
+            apiGatewayEndpoint: apiGatewayRoutes.find(r => r.serviceId === s.id)?.endpoint,
+            status: s.status,
+          })),
+          apiGatewayRoutes,
+        };
+      }
+
+      // Single-service deployment path (backward compatible)
       await log("⚙️ Provisioning application on instance...");
       const result = await performDeployment({
         instanceRecord,
@@ -139,7 +251,7 @@ export async function handleDeploymentRequest({ session, body, log }) {
         isRedeploy: false,
         existingDeployment: null,
       });
-  
+
       const deployment = await prisma.deployment.create({
         data: {
           user: { connect: { id: userId } },
@@ -164,7 +276,7 @@ export async function handleDeploymentRequest({ session, body, log }) {
           entryPoint: result.entryPoint,
         },
       });
-  
+
       await log("✅ Deployment saved successfully");
       
       // Remove all cached information because now we have a new deployment for this instance state so we need to remove instances and deployments as well as analytics removal 

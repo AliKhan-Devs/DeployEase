@@ -62,11 +62,6 @@ export async function POST(req) {
   const results = [];
 
   for (const deployment of deployments) {
-    if (!deployment.instance) {
-      results.push({ deploymentId: deployment.id, status: "skipped", reason: "Missing instance" });
-      continue;
-    }
-
     const log = createLogger(deployment.userId || deployment.user?.id || "");
     await prisma.deployment.update({
       where: { id: deployment.id },
@@ -74,32 +69,85 @@ export async function POST(req) {
     });
 
     try {
-      const result = await performDeployment({
-        instanceRecord: deployment.instance,
-        repoName: deployment.repoName,
-        repoUrl: deployment.repoUrl,
-        branch: deployment.branch,
-        appType: deployment.appType,
-        mainfile: deployment.entryPoint || defaultEntryPoint(deployment.appType),
-        port: deployment.appPort,
-        env: deployment.envVars,
-        repoSubPath: deployment.repoSubPath,
-        autoDeploy: true,
-        log,
-        isRedeploy: true,
-        existingDeployment: deployment,
-      });
+      // Check deployment type: EC2 or S3
+      const deploymentType = deployment.deploymentType || "ec2";
 
-      await prisma.deployment.update({
-        where: { id: deployment.id },
-        data: {
-          status: "SUCCESS",
-          appPort: result.appPort,
-          exposedUrl: result.exposedUrl,
-          updatedAt: new Date(),
-        },
-      });
-      results.push({ deploymentId: deployment.id, status: "success" });
+      if (deploymentType === "s3") {
+        // S3 deployment
+        if (!deployment.user?.awsAccessKeyId || !deployment.user?.awsSecretAccessKey) {
+          results.push({ 
+            deploymentId: deployment.id, 
+            status: "skipped", 
+            reason: "Missing AWS credentials for S3 deployment" 
+          });
+          continue;
+        }
+
+        const { deployToS3 } = await import("@/lib/utils/deployments/deployToS3");
+        
+        const result = await deployToS3({
+          accessKeyId: deployment.user.awsAccessKeyId,
+          secretAccessKey: deployment.user.awsSecretAccessKey,
+          region: deployment.s3Region || "us-east-1",
+          repoUrl: deployment.repoUrl,
+          branch: deployment.branch,
+          repoName: deployment.repoName,
+          buildCommand: deployment.buildCommand || null,
+          outputDirectory: deployment.outputDirectory || null,
+          log,
+          bucketName: deployment.s3BucketName || null,
+        });
+
+        await prisma.deployment.update({
+          where: { id: deployment.id },
+          data: {
+            status: "SUCCESS",
+            s3BucketName: result.bucketName,
+            s3Region: result.region,
+            s3WebsiteUrl: result.websiteUrl,
+            exposedUrl: result.websiteUrl,
+            updatedAt: new Date(),
+          },
+        });
+        results.push({ deploymentId: deployment.id, status: "success", type: "s3" });
+      } else {
+        // EC2 deployment
+        if (!deployment.instance) {
+          results.push({ 
+            deploymentId: deployment.id, 
+            status: "skipped", 
+            reason: "Missing instance for EC2 deployment" 
+          });
+          continue;
+        }
+
+        const result = await performDeployment({
+          instanceRecord: deployment.instance,
+          repoName: deployment.repoName,
+          repoUrl: deployment.repoUrl,
+          branch: deployment.branch,
+          appType: deployment.appType,
+          mainfile: deployment.entryPoint || defaultEntryPoint(deployment.appType),
+          port: deployment.appPort,
+          env: deployment.envVars,
+          repoSubPath: deployment.repoSubPath,
+          autoDeploy: true,
+          log,
+          isRedeploy: true,
+          existingDeployment: deployment,
+        });
+
+        await prisma.deployment.update({
+          where: { id: deployment.id },
+          data: {
+            status: "SUCCESS",
+            appPort: result.appPort,
+            exposedUrl: result.exposedUrl,
+            updatedAt: new Date(),
+          },
+        });
+        results.push({ deploymentId: deployment.id, status: "success", type: "ec2" });
+      }
     } catch (err) {
       await prisma.deployment.update({
         where: { id: deployment.id },

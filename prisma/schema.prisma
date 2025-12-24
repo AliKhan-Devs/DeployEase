@@ -21,6 +21,7 @@ model User {
   projects     Project[]
   deployments  Deployment[] 
   ec2Instances Ec2Instance[]
+  services     Service[]
 }
 
 model Project {
@@ -32,6 +33,7 @@ model Project {
   user        User         @relation(fields: [userId], references: [id])
   userId      String
   deployments Deployment[]
+  services    Service[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 }
@@ -47,6 +49,10 @@ model Deployment {
 
   instanceId String?
   instance   Ec2Instance? @relation(fields: [instanceId], references: [id])
+
+  // Service relationship (for multi-service deployments)
+  serviceId String?
+  service   Service? @relation(fields: [serviceId], references: [id])
 
   repoName      String
   repoUrl       String
@@ -65,6 +71,19 @@ model Deployment {
   repoSubPath   String?
   repoPath      String?
   entryPoint    String?
+  
+  // Deployment type: "ec2" or "s3"
+  deploymentType String @default("ec2")
+  
+  // S3 specific fields
+  s3BucketName   String?
+  s3Region       String?
+  s3WebsiteUrl   String?
+  
+  // Build configuration
+  buildCommand   String? // e.g., "npm run build"
+  outputDirectory String? // e.g., "dist", "build", "out"
+  
   startedAt     DateTime     @default(now())
   createdAt     DateTime     @default(now())
   finishedAt    DateTime?
@@ -98,4 +117,79 @@ model Ec2Instance {
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
   deployments       Deployment[]
+  services          Service[]
+}
+
+// Service model for multi-service/monorepo deployments
+model Service {
+  id String @id @default(cuid())
+
+  // Service identification
+  name        String // Service name (e.g., "api", "frontend", "worker")
+  displayName String? // Optional display name
+  
+  // Repository information
+  repoUrl     String
+  repoName    String
+  branch      String @default("main")
+  repoSubPath String? // Path to service within monorepo (e.g., "services/api")
+  
+  // Service configuration
+  appType        String @default("node") // node, python, react, static
+  appPort        Int? // Port for runtime apps
+  entryPoint     String? // Entry point file (e.g., "index.js", "main.py")
+  buildCommand   String? // Build command (e.g., "npm run build")
+  outputDirectory String? // Output directory for static/React apps
+  
+  // Environment and deployment
+  envVars        String? // Environment variables (JSON string)
+  deploymentType String @default("ec2") // "ec2" or "s3"
+  
+  // Infrastructure resources (per-service isolation)
+  targetGroupArn    String? // ALB Target Group ARN
+  targetGroupName   String? // Target Group name
+  autoScalingGroupName String? // ASG name
+  healthCheckPath   String? @default("/health") // Health check endpoint
+  healthCheckPort   Int? // Health check port
+  
+  // API Gateway integration
+  apiGatewayRouteKey String? // API Gateway route (e.g., "GET /api/v1/users")
+  apiGatewayEndpoint String? // API Gateway endpoint URL
+  
+  // EC2 instance (if deployed to EC2)
+  instanceId String?
+  instance   Ec2Instance? @relation(fields: [instanceId], references: [id])
+  
+  // User and project relationships
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+  
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id])
+  
+  // Status and metadata
+  status      DeployStatus @default(PENDING)
+  exposedUrl  String? // Public URL for the service
+  slug        String? // URL slug/identifier
+  
+  // S3 specific (for static deployments)
+  s3BucketName String?
+  s3Region     String?
+  s3WebsiteUrl String?
+  
+  // Scaling configuration
+  minInstances Int @default(1)
+  maxInstances Int @default(3)
+  desiredInstances Int @default(1)
+  
+  // Observability hooks (design-level, for future use)
+  logGroupName String? // CloudWatch Log Group
+  metricsNamespace String? // CloudWatch Metrics Namespace
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  deployments Deployment[] // Service can have multiple deployments (for rollback/versioning)
 }

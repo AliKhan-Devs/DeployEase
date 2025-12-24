@@ -293,7 +293,7 @@ export default function RepoDeployPage() {
 
             {!form.targetInstanceId && (
               <>
-                <Input
+                {/* <Input
                   name="accessKeyId"
                   placeholder="AWS Access Key ID"
                   value={form.accessKeyId}
@@ -305,7 +305,7 @@ export default function RepoDeployPage() {
                   placeholder="AWS Secret Access Key"
                   value={form.secretAccessKey}
                   onChange={handleChange}
-                />
+                /> */}
                 <Input
                   name="region"
                   placeholder="AWS Region (default: us-east-1)"
@@ -321,18 +321,18 @@ export default function RepoDeployPage() {
               </>
             )}
 
-            <Input
+            {form.appType != 'react' && <Input
               name="port"
               placeholder="Port (e.g. 3000)"
               value={form.port}
               onChange={handleChange}
-            />
-            <Input
+            />}
+            {form.appType != 'react' &&<Input
               name="mainfile"
               placeholder="Main file / Command"
               value={form.mainfile}
               onChange={handleChange}
-            />
+            />}
             <select name="appType" value={form.appType} onChange={handleChange} className="p-2 rounded bg-gray-100 dark:bg-gray-700">
               <option value="node">Node.js</option>
               <option value="react">React</option>

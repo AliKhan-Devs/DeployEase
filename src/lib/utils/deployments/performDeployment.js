@@ -53,11 +53,11 @@ export async function performDeployment({
   try {
     await log("🔑 Connecting to instance via SSH...");
 
-    await ssh.connect({
-      host: instanceRecord.publicIp,
-      username: instanceRecord.sshUsername || "ubuntu",
-      privateKey: decryptedKey,
-    });
+    // await ssh.connect({
+    //   host: instanceRecord.publicIp,
+    //   username: instanceRecord.sshUsername || "ubuntu",
+    //   privateKey: decryptedKey,
+    // });
     await log("⏳ Waiting for SSH service to be ready...");
     
     await waitForSSH(
