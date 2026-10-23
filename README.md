@@ -184,7 +184,7 @@ App runs at `http://localhost:3000`
 
 ---
 
-## 🤖 MCP Server Setup
+## MCP Server Setup
 
 The MCP server lets AI agents (Claude, GPT, etc.) deploy and manage infrastructure through natural language.
 
