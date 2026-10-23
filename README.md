@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🚀 DeployEase
+# DeployEase
 
 ### AWS Deployment Automation Platform
 
@@ -16,7 +16,7 @@
 
 ---
 
-## 🧠 The Problem
+## The Problem
 
 Deploying a Node.js or React app to AWS involves a painful sequence of manual steps: provisioning EC2 instances, configuring security groups, setting up Nginx as a reverse proxy, installing runtime dependencies, managing environment variables, and generating public URLs. For developers, students, and small teams, this friction is a real barrier.
 
@@ -24,15 +24,15 @@ Deploying a Node.js or React app to AWS involves a painful sequence of manual st
 
 ---
 
-## 📺 Demo
+## Demo
 
-> 🎬 **[Watch the full walkthrough on LinkedIn](https://www.linkedin.com/in/alikhan-devs/)** — covers one-click deployment, live SSH terminal, auto-scaling, and the MCP server for AI agents.
+> **[Watch the full walkthrough on LinkedIn](https://www.linkedin.com/in/alikhan-devs/)** — covers one-click deployment, live SSH terminal, auto-scaling, and the MCP server for AI agents.
 
 ![Architecture](./public/archetecture.png)
 
 ---
 
-## ✨ Features
+## Features
 
 ### Core Deployment
 | Feature | Description |
@@ -61,7 +61,7 @@ Deploying a Node.js or React app to AWS involves a painful sequence of manual st
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -103,7 +103,7 @@ User selects repo → GitHub API fetches code → EC2 instance provisioned
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -118,7 +118,7 @@ User selects repo → GitHub API fetches code → EC2 instance provisioned
 
 ---
 
-## ⚙️ Local Setup
+## Local Setup
 
 ### Prerequisites
 - Node.js v18+
@@ -205,7 +205,7 @@ get_deployment_status → Check health and status of a specific deployment
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 DeployEase/
@@ -232,7 +232,7 @@ DeployEase/
 
 ---
 
-## 🗺️ Roadmap
+## Roadmap
 
 - [ ] **Health Checks & Monitoring** — Detect unhealthy instances, visual CPU/memory metrics on dashboard
 - [ ] **HTTPS/SSL** — Automatic TLS via Let's Encrypt
@@ -245,7 +245,7 @@ DeployEase/
 
 ---
 
-## 🔐 Security Notes
+## Security Notes
 
 - AWS credentials are stored as environment variables only — never committed to the repository
 - GitHub OAuth tokens are scoped to repo read access
@@ -254,7 +254,7 @@ DeployEase/
 
 ---
 
-## 👨‍💻 Author
+## Author
 
 **Ali Khan** — Backend Engineer | AWS | Node.js | Distributed Systems
 
