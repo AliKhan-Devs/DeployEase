@@ -18,31 +18,59 @@ export async function GET() {
   const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
   const geminiApiKey = process.env.GEMINI_API_KEY;
 
-  let provider = null;
-  let providerName = null;
-
+  // Return all available providers so user can choose
+  const availableProviders = [];
+  
   if (openaiApiKey) {
-    provider = "openai";
-    providerName = "OpenAI (GPT)";
-  } else if (anthropicApiKey) {
-    provider = "anthropic";
-    providerName = "Anthropic (Claude)";
-  } else if (geminiApiKey) {
-    provider = "gemini";
-    providerName = "Google Gemini";
-  } else {
-    provider = "fallback";
-    providerName = "Rule-based (No API Key)";
+    availableProviders.push({
+      id: "openai",
+      name: "OpenAI",
+      displayName: "GPT-4o-mini (OpenAI)",
+      icon: "🤖",
+    });
   }
+  
+  if (anthropicApiKey) {
+    availableProviders.push({
+      id: "anthropic",
+      name: "Anthropic",
+      displayName: "Claude (Anthropic)",
+      icon: "🧠",
+    });
+  }
+  
+  if (geminiApiKey) {
+    availableProviders.push({
+      id: "gemini",
+      name: "Google",
+      displayName: "Gemini (Google)",
+      icon: "✨",
+    });
+  }
+
+  // Fallback if no providers
+  if (availableProviders.length === 0) {
+    availableProviders.push({
+      id: "fallback",
+      name: "Fallback",
+      displayName: "Rule-based (No API Key)",
+      icon: "⚙️",
+    });
+  }
+
+  // Default provider (first available, or fallback)
+  const defaultProvider = availableProviders[0];
 
   return new Response(JSON.stringify({
     success: true,
-    provider,
-    providerName,
+    providers: availableProviders,
+    defaultProvider: defaultProvider.id,
     hasApiKey: !!openaiApiKey || !!anthropicApiKey || !!geminiApiKey,
-    message: provider === "fallback" 
-      ? "Using rule-based AI. Add OPENAI_API_KEY, ANTHROPIC_API_KEY, or GEMINI_API_KEY to your .env for enhanced AI capabilities."
-      : `Using ${providerName} for AI responses.`,
+    message: availableProviders.length > 1
+      ? `Multiple AI providers available. Choose your preferred model.`
+      : availableProviders[0].id === "fallback"
+        ? "Using rule-based AI. Add OPENAI_API_KEY, ANTHROPIC_API_KEY, or GEMINI_API_KEY to your .env for enhanced AI capabilities."
+        : `Using ${defaultProvider.displayName} for AI responses.`,
   }), {
     status: 200,
     headers: { "Content-Type": "application/json" }
