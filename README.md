@@ -26,7 +26,7 @@ Deploying a Node.js or React app to AWS involves a painful sequence of manual st
 
 ## Demo
 
-> **[Watch the full walkthrough on LinkedIn](https://www.linkedin.com/in/alikhan-devs/)** — covers one-click deployment, live SSH terminal, auto-scaling, and the MCP server for AI agents.
+> **[Watch the full walkthrough on LinkedIn](https://www.linkedin.com/feed/update/urn:li:activity:7403282110058250242/)** — covers one-click deployment, live SSH terminal, auto-scaling, and the MCP server for AI agents.
 
 ![Architecture](./public/archetecture.png)
 
